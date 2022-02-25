@@ -1,0 +1,13 @@
+<mxfile host="65bd71144e">
+    <diagram id="qpP_EQStheEH3gYCDZWk" name="Page-1">
+        <mxGraphModel dx="764" dy="680" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="sequenceDiagram&#10;    participant Alice&#10;    participant Bob&#10;    Alice-&gt;&gt;John: Hello John, how are you?&#10;    loop Healthcheck&#10;        John-&gt;&gt;John: Fight against hypochondria&#10;    end&#10;    Note right of John: Rational thoughts &lt;br/&gt;prevail!&#10;    John--&gt;&gt;Alice: Great!&#10;    John-&gt;&gt;Bob: How about you?&#10;    Bob--&gt;&gt;John: Jolly good!" style="shadow=0;dashed=0;align=left;strokeWidth=1;shape=mxgraph.mermaid.abstract.mermaid;labelBackgroundColor=#ffffff;noLabel=1;theme=default;" parent="1" vertex="1">
+                    <mxGeometry x="110" y="60" width="400" height="300" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
