@@ -1,0 +1,1 @@
+The files in this project are diagrams created in sduml and imported into draw.io as images.
