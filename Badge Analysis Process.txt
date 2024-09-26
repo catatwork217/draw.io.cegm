@@ -1,0 +1,108 @@
+title Badge Analysis Request Process
+
+actor #blue Customer
+activate Customer
+
+participantgroup #lightgreen **Sales/Support**
+participant :2 Support / Sales
+participant Case
+end
+
+participantgroup #D5E8D4 **Services**
+participant :2 Services
+participant :2 "++**Project**++" as P
+entity :1 "++**Badge Analysis Form**++" as Badge
+end
+
+participantgroup #lightblue **Time Clocks Team**
+participant :3 "++**Team Gremlin**++" as T
+participant #purple:2 "++**Product Owner**++" as PO
+entity #red:1 "++**//Dev Analysis Item**//++" as ADO
+entity #A994F4:1 "++**Verification Task**++" as Vf
+end
+
+activate Support / Sales
+Customer->Support / Sales:
+aboxright right of Customer#lightblue:Badge Analysis requested.
+Support / Sales->*Case:<<create>>
+activate Case
+note over Case#pink:**Sales creates Salesforce case**\n& generate SOW. SOW appended to case.
+Customer<#darkred-Case:
+abox over Support / Sales#lightyellow:SOW handed to Customer for signature.\n**//SOW signature triggers creation of Services project.**//
+activate Services
+aboxright right of Case#lightyellow:**<<create>> Project**
+Support / Sales-#darkred>*P:
+activate P
+deactivate Support / Sales
+activate Badge
+Badge<-Services:
+note over P#yellow:Services team grabs the correct Badge Analysis Form, and will work with the Customer\nto obtain the information needed on the form as part of the first step of the **Services project**.\n**//This step will result in billable hours.**//
+Badge-->Services:
+Services-->Customer:
+abox over Case#lightyellow:Customer & Services fill out form.
+Customer--#green>Services:
+abox over Services#yellow:Services uses form data and other case specifics to generate\n**Dev Analysis ADO Item for the team.**
+deactivate Customer
+activate ADO
+activate T
+abox over Services#lightyellow:**<<create>> Dev Analysis Item**.
+Services-#darkred>ADO:
+abox over PO#yellow:Team enters project\nonce **Dev Analysis item\ngenerated in ADO**.
+T<--ADO:
+aboxleft left of ADO#lightyellow://Team reviews scope of work.//
+activate PO
+T<-->PO:
+abox over PO#E7D3FB:Team & **PO** meet to review Dev Analysis item.\n**//This step may occur during EST, with Services/\nCase Owner or during a formal meeting.**//
+PO--#darkred>Services:
+control #red:1 Badge Type Supported?
+activate Badge Type Supported?
+T->Badge Type Supported?:
+abox over ADO#lightyellow:**Badge type supported?**
+note over Badge Type Supported?#yellow:**//If badge format not supported Customer may need to purchase more hardware.**
+Badge Type Supported?--#red:2>>Support / Sales:
+abox over ADO#lightpink:**Unsupported badge format.**
+Badge Type Supported?<<#green:2-Services:
+abox over ADO#lightgreen:**//Supported badge format**//.
+deactivate Badge Type Supported?
+T<->ADO:
+abox over PO#E7D3FB://Badge script ready.//\n**//The completion of dev work triggers creation of Verification task\n& final review prior to shipping.**//
+T-#darkred>*Vf:
+activate Vf
+abox over Vf#lightyellow:**<<create>> Verification Task**.
+control #red:1 Badge script matches format requested?
+activate Badge script matches format requested?
+T->Badge script matches format requested?:
+aboxright right of T#lightyellow:**Badge format script review.**
+note over Badge script matches format requested?#yellow:**//Engineering reviews SQL badge format script\nto check that it matches the badge format\nspecifications in the request.**//
+Badge script matches format requested?--#red:2>T:
+abox over Vf#lightpink:**Script does not match format requested. Script requires changes.**
+T-#green:2>Badge script matches format requested?:
+abox over Vf#lightgreen:**//Script matches format request. Proceed with verification and closure.**//
+deactivate Badge script matches format requested?
+Vf<->T:
+abox over PO#E7D3FB:**Engineering Review completed and task closed.**
+deactivate Badge
+deactivate Vf
+aboxleft left of ADO#lightyellow:**ADO item closed.**
+deactivate ADO
+PO->Services:
+aboxleft left of PO#yellow:**PO Notifies stakeholders that script is ready to ship.**
+activate Customer
+deactivate PO
+deactivate T
+Services->Customer:
+aboxleft left of Services#lightyellow:**//Script shipped to Customer.**//
+P->P:
+abox over P#lightyellow:**Project Closed.**
+Case->Case:
+abox over Case#lightyellow:**Case Closed.**
+deactivate P
+deactivate Case
+deactivate Services
+deactivate Customer
+
+
+
+
+
+

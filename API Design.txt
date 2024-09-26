@@ -1,0 +1,100 @@
+title API High-level Data Flow
+
+
+participantgroup #lightgrey #black:1 **IO Motion hardware & system**
+participant #blue:1 "++**Employee (User)**++" as U
+participant #pink:1 "++**UKG Device**++" as Badge
+entity #FC56A1:1 "++**IOMotion service**++" as IO
+participant #black:1 "++**Workday**++" as Workday
+end
+
+participantgroup #lightyellow #darkgrey:1 **Connected Enterprise (CE)**
+boundary #purple:2 "++**API Gateway (Mulesoft)**++" as M
+entity #black:1 "++**Tenant Config Service**++" as TCS
+end
+
+participantgroup #D5E8D4 #darkgreen:1 **sWorkforce (sW)**
+boundary #green:1 "++**sW Integration Server**++" as SWS
+entity #lightgreen:1 "++**sW Web Services Server**++" as serv
+database #maroon:2 "++**sW Database**++" as SWD
+entity #olive:1 "++**sW Service Bus**++" as SWB
+end
+
+activate U
+activate Badge
+U->Badge:User swipes badge to trigger process.
+activate IO
+Badge->IO:Swipe registered at IOMotion service-level
+note right of Workday#yellow:**Service to service communication** (IOMotion -> symplr API Gateway [tenant-level authentication]).
+activate M
+activate SWS
+activate serv
+activate SWD
+activate SWB
+IO->M:Vendor Credentials (ioMotion-vendor)
+aboxright left of M#yellow:**Vendor Credentials** (IOMotion-vendor) OR Customer tenantID?\n\nIs this customer? **Customer credentials** {client-code}-client
+note right of Workday#pink:**This step involes translation from JWT Token that is public-facing into a form 'readable' by CE resources**
+activate TCS
+M->TCS:
+TCS-->>M:return
+deactivate TCS
+note right of TCS#yellow:**Internal Product Credentials**\n{wfm-sWorkforce-internal}
+M->SWS:
+aboxright right of TCS#pink:**//PingOne IdP token passes\nto the Integration Server from Mulesoft API Gateway\nfor authentication.**//
+activate SWS
+SWS->SWS:Process request
+SWS->serv:
+aboxright left of serv #pink:We use PingOne to authenticate the API Gateway to the sW Integration Server\n**// and then AzureAD to authenticate the sW Integration Server\nto the web-services (or other Azure resources).//**
+note right of SWS#yellow:**sWorkforce Deployment Credentials**\n(wfm-workforce-prd-system-integration-service)\n//**Example**//:\nWe want to get employee.\n**//Ontology can decide**// that the route for employee is /employee/{id}.\nFrom the original URL - https://hmhi098.workforce.symplr.com/tm/live/integration-services/\nThis would result in an updated URL - https://hmhi098.workforce.symplr.com/tm/live/integration-services/**//employee/5**//
+serv--#purple>>SWS:return
+SWS->SWD:
+SWD--#purple>>SWS:return
+SWS->SWB:
+SWB--#purple>>SWS:return
+deactivate SWS
+note over serv#yellow:**Production route for Web Services**\nhttps://{tenantID}.workforce.symplr.com/tm/live/web-services/
+deactivate SWS
+SWS--#purple>>M:return
+M--#purple>>IO:return
+IO--#purple>>Badge:return
+deactivate serv
+deactivate SWD
+deactivate SWB
+
+Badge<<#purple:1-Badge:Timeclock updated at User level.
+Badge-#darkpurple:1>U:
+aboxleft left of Badge#yellow:User sees updated messaging or confirmation of completed action.
+deactivate Badge
+deactivate U
+deactivate IO
+
+activate SWS
+SWS->SWS:Process request
+activate Workday
+Workday->M:Vendor Credentials (workday-vendor)
+aboxright left of M#yellow:**Vendor Credentials** (workday-vendor)\nOR Is this customer?\n**Customer credentials** {client-code}-client
+
+M->TCS:
+TCS--#purple>>M:return
+note right of TCS#yellow:**Internal Product Credentials**\n{wfm-sWorkforce-internal}
+M->SWS:
+note right of SWS#yellow:**sWorkforce Deployment Credentials**\n(wfm-workforce-prd-system-integration-service)
+activate SWS
+SWS->serv:
+serv--#purple>>SWS:return
+SWS->SWD:
+SWD--#purple>>SWS:return
+SWS->SWB:
+SWB--#purple>>SWS:return
+deactivate SWS
+SWS--#purple>>M:return
+deactivate SWS
+
+M--#purple>>Workday:return
+deactivate M
+
+
+
+
+
+
